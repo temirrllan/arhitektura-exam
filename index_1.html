@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#1a1a1a">
+<title>Компьютерлік жүйелердің архитектурасы — Емтихан</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --bg-elevated: #ffffff;
+    --ink: #1a1816;
+    --ink-soft: #4a4640;
+    --ink-mute: #8a8580;
+    --accent: #b8472d;
+    --accent-soft: #e8a896;
+    --line: #e8e2d8;
+    --hover: #f3ede2;
+    --code-bg: #1a1816;
+    --code-ink: #faf7f2;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Manrope', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  [data-theme="dark"] {
+    --bg: #15130f;
+    --bg-elevated: #1f1c17;
+    --ink: #f0ebe0;
+    --ink-soft: #c0b8a8;
+    --ink-mute: #7a746a;
+    --accent: #e89478;
+    --accent-soft: #5a3024;
+    --line: #2a2620;
+    --hover: #252118;
+    --code-bg: #0a0908;
+    --code-ink: #f0ebe0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250, 247, 242, 0.92);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  [data-theme="dark"] header { background: rgba(21, 19, 15, 0.92); }
+
+  .brand {
+    font-family: var(--serif);
+    font-weight: 800;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .brand span { color: var(--accent); }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover, .icon-btn:active { background: var(--hover); border-color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    padding: 48px 20px 32px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .hero .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 8vw, 52px);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 540px;
+  }
+  .hero .meta {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+  .hero .meta span {
+    padding: 6px 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    padding: 24px 20px 0;
+  }
+  .search {
+    width: 100%;
+    padding: 14px 18px 14px 44px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-elevated);
+    font-family: var(--sans);
+    font-size: 16px;
+    color: var(--ink);
+    transition: all 0.15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%238a8580' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 14px center;
+  }
+  .search:focus { outline: none; border-color: var(--accent); }
+  .search-stats {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding-left: 4px;
+  }
+
+  /* TOC */
+  .toc {
+    padding: 24px 20px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 6px;
+  }
+  .toc-item {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+    background: var(--bg-elevated);
+    transition: all 0.15s;
+  }
+  .toc-item:hover, .toc-item:active {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  /* SECTIONS */
+  main { padding: 0 20px; max-width: 720px; margin: 0 auto; }
+
+  .section-divider {
+    margin: 48px 0 32px;
+    padding: 24px 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+  .section-divider .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-divider h2 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* QUESTION CARDS */
+  .q {
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    scroll-margin-top: 80px;
+    transition: border-color 0.2s;
+  }
+  .q:target { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .q-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .q-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  .q p { margin-bottom: 12px; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+  .q p:last-child { margin-bottom: 0; }
+  .q strong { color: var(--ink); font-weight: 600; }
+  .q em { font-style: italic; }
+
+  .q ul {
+    margin: 12px 0;
+    padding-left: 4px;
+    list-style: none;
+  }
+  .q ul li {
+    position: relative;
+    padding: 6px 0 6px 22px;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .q ul li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 14px;
+    width: 8px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .q .formula {
+    display: block;
+    font-family: var(--mono);
+    font-size: 14px;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin: 14px 0;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+
+  .q .answer {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+  }
+
+  /* TABLE */
+  .q table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+    background: var(--bg);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .q th, .q td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  .q th {
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .q td:first-child { font-weight: 600; color: var(--ink); }
+  .q tr:last-child td { border-bottom: none; }
+
+  /* HIDDEN STATE FOR SEARCH */
+  .q.hidden { display: none; }
+  .section-divider.hidden { display: none; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 64px;
+    padding: 32px 20px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    color: var(--ink-mute);
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+  footer .tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  /* SCROLL TO TOP */
+  .scroll-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s;
+    z-index: 50;
+  }
+  .scroll-top.visible { opacity: 1; pointer-events: auto; }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .hero { padding: 80px 40px 48px; }
+    main { padding: 0 40px; }
+    .toc { padding: 32px 40px; }
+    .search-wrap { padding: 32px 40px 0; }
+    header { padding: 16px 40px; }
+    footer { padding: 48px 40px; }
+    .toc-grid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+  }
+
+  /* SMOOTH ENTRANCE */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q { animation: fadeUp 0.4s ease both; }
+
+  /* Print */
+  @media print {
+    header, .scroll-top, .search-wrap, .toc { display: none; }
+    .q { break-inside: avoid; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Архитектура<span>.</span></div>
+  <div class="header-actions">
+    <button class="icon-btn" id="themeBtn" aria-label="Тема" title="Тема ауыстыру">◐</button>
+    <a href="Architektura_Emtihan_Daiyndyq.docx" class="icon-btn" download aria-label="Word жүктеу" title=".docx жүктеу">↓</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Емтиханға дайындық · 60 сұрақ</div>
+  <h1>Компьютерлік жүйелердің <em>архитектурасы</em></h1>
+  <p>Барлық емтихан сұрақтарына толық жауап. Іздеу, тез навигация, қараңғы тема. Телефонға арналып жасалған.</p>
+  <div class="meta">
+    <span>Қазақ тілінде</span>
+    <span>60 сұрақ</span>
+    <span>Іздеу қолжетімді</span>
+  </div>
+</section>
+
+<div class="search-wrap">
+  <input type="search" class="search" id="search" placeholder="Сұрақтан іздеу: процессор, кэш, RISC...">
+  <div class="search-stats" id="searchStats"></div>
+</div>
+
+<nav class="toc">
+  <div class="toc-title">Тез өту · Сұрақ нөмірі</div>
+  <div class="toc-grid" id="tocGrid"></div>
+</nav>
+
+<main id="content">
+
+<!-- ====== І БӨЛІМ ====== -->
+<div class="section-divider" data-section>
+  <div class="num">І бөлім</div>
+  <h2>Негізгі сұрақтар <em style="color:var(--ink-mute);font-weight:400;font-style:italic">— 1 ден 20-ға дейін</em></h2>
+</div>
+
+<article class="q" id="q1" data-search="ЭЕМ архитектурасы">
+  <div class="q-num">№ 01</div>
+  <h3 class="q-title">ЭЕМ архитектурасы дегеніміз не?</h3>
+  <p><strong>ЭЕМ архитектурасы</strong> — компьютердің құрылымын, оның негізгі компоненттерінің өзара әрекеттесу принциптерін және қолданушыға (программистке) көрінетін қасиеттерін сипаттайтын ұғым.</p>
+  <p>Архитектура екі деңгейді қамтиды:</p>
+  <ul>
+    <li><strong>Логикалық деңгей</strong> — командалар жүйесі, регистрлер, адрестеу тәсілдері (программист көретіні)</li>
+    <li><strong>Физикалық деңгей</strong> (микроархитектура) — ішкі құрылымы, схемалары, элементтері</li>
+  </ul>
+</article>
+
+<article class="q" id="q2" data-search="архитектура түрлері Принстон Гарвард CISC RISC Флинн">
+  <div class="q-num">№ 02</div>
+  <h3 class="q-title">Архитектураның қандай түрлері болады?</h3>
+  <ul>
+    <li><strong>Принстон (фон Нейман)</strong> — программа мен деректер бір жадта</li>
+    <li><strong>Гарвард</strong> — программа мен деректер үшін бөлек жад және шиналар</li>
+    <li><strong>Командалар жүйесі бойынша:</strong> CISC, RISC, VLIW</li>
+    <li><strong>Флинн классификациясы:</strong> SISD, SIMD, MISD, MIMD</li>
+  </ul>
+</article>
+
+<article class="q" id="q3" data-search="Гарвард архитектура">
+  <div class="q-num">№ 03</div>
+  <h3 class="q-title">Гарвард архитектурасына не жатады?</h3>
+  <p>Гарвард архитектурасында командалар (программа) жады мен деректер жады <strong>физикалық түрде бөлек</strong>, әрқайсысының өз шинасы бар. Бұл командаларды оқу мен деректерді өңдеуді бір уақытта (параллель) орындауға мүмкіндік береді.</p>
+  <p><strong>Қолданылуы:</strong> микроконтроллерлер (AVR, PIC), цифрлық сигнал процессорлары (DSP), қазіргі процессорлардың L1 кэш деңгейі (бөлек L1-I және L1-D).</p>
+</article>
+
+<article class="q" id="q4" data-search="Принстон архитектура фон Нейман">
+  <div class="q-num">№ 04</div>
+  <h3 class="q-title">Принстон архитектурасына не жатады?</h3>
+  <p>Принстон (фон-Нейман) архитектурасында программа мен деректер <strong>бір жадта</strong> сақталады және ортақ жүйелік шина арқылы процессорға жіберіледі.</p>
+  <p><strong>Артықшылығы:</strong> қарапайымдылық, икемділік. <strong>Кемшілігі:</strong> "фон-Нейман бөтелке мойны" (шинаның өткізу қабілеті шектеулі).</p>
+  <p><strong>Қолданылуы:</strong> дербес компьютерлер, серверлер, ноутбуктер.</p>
+</article>
+
+<article class="q" id="q5" data-search="ЭЕМ блоктар процессор жад">
+  <div class="q-num">№ 05</div>
+  <h3 class="q-title">ЭЕМ-нің негізгі блоктарын атаңыз</h3>
+  <ul>
+    <li><strong>Орталық процессор (CPU)</strong> — командаларды орындайды</li>
+    <li><strong>Жедел жад (RAM/ОЗУ)</strong> — деректерді уақытша сақтайды</li>
+    <li><strong>Тұрақты жад (ROM/ПЗУ)</strong> — BIOS, тұрақты программалар</li>
+    <li><strong>Сыртқы жад</strong> — HDD, SSD (ұзақ мерзімді сақтау)</li>
+    <li><strong>Енгізу/шығару құрылғылары</strong> — пернетақта, тінтуір, монитор</li>
+    <li><strong>Жүйелік шина</strong> — барлық блоктарды біріктіреді</li>
+  </ul>
+</article>
+
+<article class="q" id="q6" data-search="процессор CPU АЛҚ басқару">
+  <div class="q-num">№ 06</div>
+  <h3 class="q-title">Процессор дегеніміз не?</h3>
+  <p><strong>Процессор</strong> (CPU — Central Processing Unit) — компьютердің негізгі есептеуіш құрылғысы, ол программаның командаларын оқиды, түсіндіреді (декодтайды) және орындайды.</p>
+  <p>Екі негізгі бөліктен тұрады: <strong>АЛҚ</strong> (арифметикалық-логикалық құрылғы) және <strong>Басқару құрылғысы</strong> (УУ). Сонымен қатар регистрлер мен кэш-жад болады.</p>
+</article>
+
+<article class="q" id="q7" data-search="ішкі сыртқы жад RAM HDD">
+  <div class="q-num">№ 07</div>
+  <h3 class="q-title">Сыртқы және ішкі жадтың айырмашылықтары қандай?</h3>
+  <table>
+    <thead><tr><th>Параметр</th><th>Ішкі жад</th><th>Сыртқы жад</th></tr></thead>
+    <tbody>
+      <tr><td>Жылдамдық</td><td>Өте жоғары (нс)</td><td>Төмен (мс)</td></tr>
+      <tr><td>Көлемі</td><td>Аз (ГБ)</td><td>Үлкен (ТБ)</td></tr>
+      <tr><td>Ұшқырлық</td><td>RAM-да жоғалады</td><td>Сақталады</td></tr>
+      <tr><td>Бағасы</td><td>Қымбат</td><td>Арзан</td></tr>
+      <tr><td>Қатынас</td><td>Тікелей</td><td>Контроллер арқылы</td></tr>
+    </tbody>
+  </table>
+</article>
+
+<article class="q" id="q8" data-search="қатты диск HDD пластина шпиндель">
+  <div class="q-num">№ 08</div>
+  <h3 class="q-title">Қатты диск қалай құрылған?</h3>
+  <p><strong>HDD (Hard Disk Drive)</strong> магниттік сақтау принципімен жұмыс істейді.</p>
+  <ul>
+    <li><strong>Шпиндель</strong> — пластиналарды айналдырады (5400, 7200, 10000 айн/мин)</li>
+    <li><strong>Магниттік пластиналар</strong> — деректер концентрлік жолдарға жазылады</li>
+    <li><strong>Оқу/жазу басы</strong> — магниттік өрісті өзгертеді/оқиды</li>
+    <li><strong>Позиционер</strong> — басты дұрыс жолға жылжытады</li>
+    <li><strong>Контроллер тақтасы</strong> — дискіні басқарады</li>
+  </ul>
+  <p>Адрестеу: цилиндр–бас–сектор (CHS) немесе LBA.</p>
+</article>
+
+<article class="q" id="q9" data-search="контроллер құрылғы басқару">
+  <div class="q-num">№ 09</div>
+  <h3 class="q-title">Контроллер дегеніміз не?</h3>
+  <p><strong>Контроллер</strong> — белгілі бір құрылғыны (диск, видеокарта, USB, желі) басқаратын және оның процессормен өзара әрекетін қамтамасыз ететін арнайы микросхема немесе тақта.</p>
+  <p>Процессордан команда қабылдайды, оны құрылғы түсінетін сигналдарға аударады. Мысалдар: SATA-контроллер, USB-контроллер, видеоконтроллер.</p>
+</article>
+
+<article class="q" id="q10" data-search="Флинн SISD SIMD MIMD">
+  <div class="q-num">№ 10</div>
+  <h3 class="q-title">Флинн бойынша ЭЕМ архитектуралары</h3>
+  <p>Майкл Флинн 1966 жылы ұсынған классификация:</p>
+  <ul>
+    <li><strong>SISD</strong> — бір команда, бір дерек ағыны (классикалық бір ядролы CPU)</li>
+    <li><strong>SIMD</strong> — бір команда, көп дерек (GPU, SSE/AVX, векторлық)</li>
+    <li><strong>MISD</strong> — көп команда, бір дерек (сирек, қателерге тұрақты жүйелер)</li>
+    <li><strong>MIMD</strong> — көп команда, көп дерек (көп ядролы, кластерлер, суперкомпьютерлер)</li>
+  </ul>
+</article>
+
+<article class="q" id="q11" data-search="конвейер pipeline IF ID EX MEM WB">
+  <div class="q-num">№ 11</div>
+  <h3 class="q-title">Процессор конвейері дегеніміз не?</h3>
+  <p><strong>Конвейер (pipeline)</strong> — команданы орындау процесін бірнеше тәуелсіз сатыларға бөлу әдісі, мұнда әр сатыда әр түрлі команда бір уақытта орындалады.</p>
+  <p>Классикалық RISC-V 5 сатылы конвейері:</p>
+  <ul>
+    <li><strong>IF</strong> (Instruction Fetch) — команданы оқу</li>
+    <li><strong>ID</strong> (Instruction Decode) — декодтау</li>
+    <li><strong>EX</strong> (Execute) — АЛҚ-да орындау</li>
+    <li><strong>MEM</strong> (Memory) — жадпен жұмыс</li>
+    <li><strong>WB</strong> (Write Back) — нәтижені регистрге жазу</li>
+  </ul>
+  <p>Кемшілігі — конфликтілер (структуралық, деректік, басқару).</p>
+</article>
+
+<article class="q" id="q12" data-search="кэш L1 L2 L3 жад">
+  <div class="q-num">№ 12</div>
+  <h3 class="q-title">Кэш-жад дегеніміз не?</h3>
+  <p><strong>Кэш-жад</strong> — процессор мен жедел жад арасындағы өте жылдам, бірақ көлемі шағын аралық жад. Жиі қолданылатын деректер мен командаларды сақтайды.</p>
+  <p><strong>Деңгейлері:</strong> L1 (~32–64 КБ), L2 (~256 КБ–1 МБ), L3 (4–64 МБ ортақ).</p>
+  <p>Уақыттық және кеңістіктік локалдылық принциптеріне негізделеді. Бейнелеу әдістері: тікелей, толық ассоциативті, жиынтықтық-ассоциативті.</p>
+</article>
+
+<article class="q" id="q13" data-search="монитор VGA HDMI DisplayPort DVI">
+  <div class="q-num">№ 13</div>
+  <h3 class="q-title">Мониторларда қандай интерфейстер болады?</h3>
+  <ul>
+    <li><strong>VGA (D-Sub)</strong> — ескі аналогтық</li>
+    <li><strong>DVI</strong> — цифрлық/аналогтық</li>
+    <li><strong>HDMI</strong> — цифрлық, бейне+дыбыс</li>
+    <li><strong>DisplayPort</strong> — қазіргі ең жылдам, 4K/8K</li>
+    <li><strong>USB-C / Thunderbolt</strong> — әмбебап</li>
+  </ul>
+</article>
+
+<article class="q" id="q14" data-search="ішкі интерфейс PCI SATA M.2 NVMe">
+  <div class="q-num">№ 14</div>
+  <h3 class="q-title">ДК-нің ішкі интерфейстерін атаңыз</h3>
+  <ul>
+    <li><strong>PCI, PCI Express (PCIe)</strong> — кеңейту тақталары</li>
+    <li><strong>SATA</strong> — қатты дискілер, SSD</li>
+    <li><strong>M.2, NVMe</strong> — қазіргі жылдам SSD</li>
+    <li><strong>IDE/PATA</strong> — ескі дискілер</li>
+    <li><strong>DDR слоттары</strong> — жедел жад модульдері</li>
+  </ul>
+</article>
+
+<article class="q" id="q15" data-search="сыртқы интерфейс USB HDMI Ethernet">
+  <div class="q-num">№ 15</div>
+  <h3 class="q-title">ДК-нің сыртқы интерфейстерін атаңыз</h3>
+  <ul>
+    <li><strong>USB</strong> (Type-A, Type-C) — әмбебап</li>
+    <li><strong>HDMI, DisplayPort, VGA</strong> — мониторлар</li>
+    <li><strong>Ethernet (RJ-45)</strong> — желі</li>
+    <li><strong>Audio jack 3.5 мм</strong> — дыбыс</li>
+    <li><strong>Thunderbolt</strong> — жоғары жылдамдықты</li>
+    <li><strong>PS/2</strong> — ескі пернетақта/тінтуір</li>
+  </ul>
+</article>
+
+<article class="q" id="q16" data-search="буын лампа транзистор интегралды схема">
+  <div class="q-num">№ 16</div>
+  <h3 class="q-title">ЭЕМ элементтік базасына қарай қалай жіктеледі?</h3>
+  <ul>
+    <li><strong>I буын</strong> (1940–55) — электронды лампалар (ENIAC, MESM)</li>
+    <li><strong>II буын</strong> (1955–65) — транзисторлар</li>
+    <li><strong>III буын</strong> (1965–75) — интегралды схемалар (ИС)</li>
+    <li><strong>IV буын</strong> (1975+) — БИС, СБИС, микропроцессорлар</li>
+    <li><strong>V буын</strong> — ЖИ, кванттық, нейрондық процессорлар</li>
+  </ul>
+</article>
+
+<article class="q" id="q17" data-search="SSD HDD флэш NAND">
+  <div class="q-num">№ 17</div>
+  <h3 class="q-title">SSD дискілері HDD-дан несімен ерекшеленеді?</h3>
+  <table>
+    <thead><tr><th>Параметр</th><th>HDD</th><th>SSD</th></tr></thead>
+    <tbody>
+      <tr><td>Технология</td><td>Магниттік пластина</td><td>Флэш-жад (NAND)</td></tr>
+      <tr><td>Қозғалыс</td><td>Бар</td><td>Жоқ</td></tr>
+      <tr><td>Жылдамдық</td><td>80–160 МБ/с</td><td>500–7000 МБ/с</td></tr>
+      <tr><td>Шу</td><td>Бар</td><td>Жоқ</td></tr>
+      <tr><td>Сілкінуге</td><td>Сезімтал</td><td>Тұрақты</td></tr>
+      <tr><td>Энергия</td><td>Көп</td><td>Аз</td></tr>
+      <tr><td>Бағасы (1ГБ)</td><td>Арзан</td><td>Қымбатырақ</td></tr>
+    </tbody>
+  </table>
+</article>
+
+<article class="q" id="q18" data-search="микроархитектура ISA Intel AMD">
+  <div class="q-num">№ 18</div>
+  <h3 class="q-title">Микроархитектура дегеніміз не?</h3>
+  <p><strong>Микроархитектура</strong> — процессордың командалар жүйесі архитектурасын (ISA) физикалық деңгейде іске асыру тәсілі.</p>
+  <p>Архитектура — "не істейді", микроархитектура — "қалай істейді". Кіреді: конвейер сатылары, кэш құрылымы, орындау блоктары, болжау схемалары.</p>
+  <p><strong>Мысал:</strong> Intel Core i7 және AMD Ryzen — екеуі де x86 архитектурасы, бірақ микроархитектуралары әр түрлі.</p>
+</article>
+
+<article class="q" id="q19" data-search="USB universal serial bus 2.0 3.0">
+  <div class="q-num">№ 19</div>
+  <h3 class="q-title">USB дегеніміз не және оның сипаттамалары қандай?</h3>
+  <p><strong>USB (Universal Serial Bus)</strong> — әмбебап тізбекті шина, сыртқы құрылғыларды қосуға арналған стандарт.</p>
+  <ul>
+    <li><strong>USB 1.0/1.1</strong> — 1.5 / 12 Мбит/с</li>
+    <li><strong>USB 2.0</strong> — 480 Мбит/с</li>
+    <li><strong>USB 3.0/3.1 Gen 1</strong> — 5 Гбит/с</li>
+    <li><strong>USB 3.1 Gen 2</strong> — 10 Гбит/с</li>
+    <li><strong>USB 3.2</strong> — 20 Гбит/с</li>
+    <li><strong>USB 4</strong> — 40 Гбит/с</li>
+  </ul>
+  <p>Ерекшеліктері: Plug-and-Play, hot-swap, Power Delivery (100 Вт-қа дейін).</p>
+</article>
+
+<article class="q" id="q20" data-search="жад түрлері SRAM DRAM ROM Flash">
+  <div class="q-num">№ 20</div>
+  <h3 class="q-title">Жадтың қандай түрлері бар?</h3>
+  <p><strong>Қызметі бойынша:</strong></p>
+  <ul>
+    <li>Регистрлер — процессор ішіндегі ең жылдам</li>
+    <li>Кэш-жад (L1, L2, L3)</li>
+    <li>Жедел жад (RAM/ОЗУ)</li>
+    <li>Тұрақты жад (ROM/ПЗУ)</li>
+    <li>Сыртқы жад — HDD, SSD, флэш</li>
+  </ul>
+  <p><strong>Технология бойынша:</strong></p>
+  <ul>
+    <li><strong>SRAM</strong> — триггерде, тез, қымбат — кэш үшін</li>
+    <li><strong>DRAM</strong> — конденсаторда, баяуырақ, арзан — RAM үшін</li>
+    <li><strong>Flash, EEPROM, ROM</strong> — энергоғатәуелсіз</li>
+  </ul>
+</article>
+
+<!-- ====== ІІ БӨЛІМ ====== -->
+<div class="section-divider" data-section>
+  <div class="num">ІІ бөлім</div>
+  <h2>Қосымша сұрақтар <em style="color:var(--ink-mute);font-weight:400;font-style:italic">— 21 ден 60-қа дейін</em></h2>
+</div>
+
+<article class="q" id="q21" data-search="операциялық жүйе мақсат">
+  <div class="q-num">№ 21</div>
+  <h3 class="q-title">Операциялық жүйенің мақсаттары</h3>
+  <ul>
+    <li>Аппараттық ресурстарды тиімді басқару</li>
+    <li>Қолданушыға қолайлы интерфейс ұсыну</li>
+    <li>Мультитаскинг қамтамасыз ету</li>
+    <li>Файлдық жүйені басқару</li>
+    <li>Қауіпсіздік пен қорғаныс</li>
+    <li>Аппаратураны жасыру (абстракция)</li>
+  </ul>
+</article>
+
+<article class="q" id="q22" data-search="гибридті процессор P-core E-core">
+  <div class="q-num">№ 22</div>
+  <h3 class="q-title">Гибридті процессор дегеніміз не?</h3>
+  <p><strong>Гибридті процессор</strong> — бір кристалда әр түрлі архитектуралы немесе мақсаттағы ядроларды біріктіретін процессор.</p>
+  <p><strong>Мысалдар:</strong> Intel Alder Lake (P-cores өнімді + E-cores үнемді), ARM big.LITTLE (Cortex-A76 + A55), APU (CPU+GPU).</p>
+</article>
+
+<article class="q" id="q23" data-search="компьютер компонент аналық плата">
+  <div class="q-num">№ 23</div>
+  <h3 class="q-title">Компьютер құрылғысының негізгі компоненттері</h3>
+  <p>Аналық плата (motherboard), CPU, RAM, HDD/SSD, GPU, қуат көзі (PSU), корпус, салқындату, енгізу/шығару құрылғылары.</p>
+</article>
+
+<article class="q" id="q24" data-search="процессор бірінші ROM BIOS">
+  <div class="q-num">№ 24</div>
+  <h3 class="q-title">Процессор ең бірінші қай құрылғымен әрекеттеседі?</h3>
+  <p>Процессор іске қосылғанда ең бірінші <strong>ROM (тұрақты жад)</strong> ішіндегі <strong>BIOS/UEFI</strong> программасына жүгінеді. Содан кейін регистрлер мен RAM-мен жүйелік шина арқылы әрекеттеседі.</p>
+</article>
+
+<article class="q" id="q25" data-search="диск жоспарлау FCFS SSTF SCAN">
+  <div class="q-num">№ 25</div>
+  <h3 class="q-title">Қатты дисктен оқу алгоритмдері</h3>
+  <ul>
+    <li><strong>FCFS</strong> — кезек бойынша</li>
+    <li><strong>SSTF</strong> — ең жақын секторды бірінші</li>
+    <li><strong>SCAN</strong> ("лифт") — бір бағытта жылжып, кейін кері</li>
+    <li><strong>C-SCAN</strong> — циклдық SCAN</li>
+    <li><strong>LOOK / C-LOOK</strong> — жетілдірілген SCAN</li>
+  </ul>
+</article>
+
+<article class="q" id="q26" data-search="процессор бөлік АЛҚ басқару">
+  <div class="q-num">№ 26</div>
+  <h3 class="q-title">Процессор қандай екі бөліктен тұрады?</h3>
+  <ul>
+    <li><strong>АЛҚ</strong> (Арифметикалық-логикалық құрылғы) — арифметикалық (+, –, ×, ÷) және логикалық (AND, OR, NOT) амалдар</li>
+    <li><strong>Басқару құрылғысы (УУ)</strong> — командаларды декодтайды, орындалу тәртібін басқарады</li>
+  </ul>
+</article>
+
+<article class="q" id="q27" data-search="процессор міндет fetch decode execute">
+  <div class="q-num">№ 27</div>
+  <h3 class="q-title">Процессордың ең негізгі екі міндеті</h3>
+  <p>1) Программа командаларын жадтан <strong>оқу (fetch)</strong> және <strong>түсіндіру (decode)</strong></p>
+  <p>2) Сол командаларды <strong>орындау (execute)</strong> — деректермен амалдар жасап, нәтижені сақтау</p>
+  <p>Қысқаша: <strong>fetch–decode–execute</strong> циклі.</p>
+</article>
+
+<article class="q" id="q28" data-search="программист ISA регистр">
+  <div class="q-num">№ 28</div>
+  <h3 class="q-title">Программист процессормен өзара тікелей әрекеттесетін бөлік</h3>
+  <p><strong>Командалар жүйесі архитектурасы (ISA — Instruction Set Architecture)</strong> және <strong>регистрлер файлы</strong>. Программист ассемблерде жазғанда осы командалармен жұмыс істейді (RISC-V, x86, ARM).</p>
+</article>
+
+<article class="q" id="q29" data-search="интерфейс CLI GUI TUI VUI">
+  <div class="q-num">№ 29</div>
+  <h3 class="q-title">Қолданушы интерфейстері</h3>
+  <ul>
+    <li><strong>CLI</strong> — команда жолы (terminal, cmd, bash)</li>
+    <li><strong>GUI</strong> — графикалық (Windows, macOS)</li>
+    <li><strong>TUI</strong> — мәтіндік-терезелік</li>
+    <li><strong>VUI</strong> — дауыстық (Siri, Alexa)</li>
+    <li><strong>Touch UI</strong> — сенсорлық</li>
+  </ul>
+</article>
+
+<article class="q" id="q30" data-search="GUI WIMP терезе белгіше мәзір">
+  <div class="q-num">№ 30</div>
+  <h3 class="q-title">GUI негізгі ұғымдары (WIMP)</h3>
+  <ul>
+    <li><strong>W</strong> — Windows (терезелер)</li>
+    <li><strong>I</strong> — Icons (белгішелер)</li>
+    <li><strong>M</strong> — Menus (мәзірлер)</li>
+    <li><strong>P</strong> — Pointer (меңзер)</li>
+  </ul>
+  <p>Сонымен қатар: жұмыс үстелі, батырмалар, диалог терезелері, скроллбар.</p>
+</article>
+
+<article class="q" id="q31" data-search="тактілік жиілік ГГц IPC MIPS">
+  <div class="q-num">№ 31</div>
+  <h3 class="q-title">Микропроцессордың жұмыс жылдамдығының көрсеткіші</h3>
+  <p><strong>Тактілік жиілік</strong> (Гц, МГц, ГГц). Қазіргі процессорлар 2–5 ГГц.</p>
+  <p>Сонымен қатар: <strong>IPC</strong> (Instructions Per Cycle), <strong>MIPS</strong>, <strong>FLOPS</strong>.</p>
+</article>
+
+<article class="q" id="q32" data-search="разрядтылық 32 64 бит">
+  <div class="q-num">№ 32</div>
+  <h3 class="q-title">Микропроцессор разрядтылығы</h3>
+  <p><strong>Разрядтылық</strong> — процессор бір тактіде өңдей алатын биттер саны. Регистрлер, АЛҚ, деректер шинасының енімен анықталады.</p>
+  <p>64-биттік процессор 2⁶⁴ ≈ 18 эксабайт жадты адрестей алады, 32-биттік — небәрі 4 ГБ.</p>
+</article>
+
+<article class="q" id="q33" data-search="контроллер делдал">
+  <div class="q-num">№ 33</div>
+  <h3 class="q-title">Контроллер дегеніміз</h3>
+  <p>Белгілі бір құрылғыны басқаратын арнайы микросхема (қара. №9). Процессор мен сыртқы құрылғы арасындағы делдал.</p>
+</article>
+
+<article class="q" id="q34" data-search="RAM жедел жад DRAM SRAM DDR">
+  <div class="q-num">№ 34</div>
+  <h3 class="q-title">RAM (жедел жад) дегеніміз</h3>
+  <p><strong>RAM (Random Access Memory)</strong> — программа орындалу кезінде деректерді уақытша сақтайтын жад.</p>
+  <ul>
+    <li>Кез келген ұяшыққа кездейсоқ қатынау</li>
+    <li>Жоғары жылдамдық</li>
+    <li>Энергияға тәуелді</li>
+    <li>Түрлері: DRAM, SRAM</li>
+    <li>Стандарттары: DDR3, DDR4, DDR5</li>
+  </ul>
+</article>
+
+<article class="q" id="q35" data-search="модуль шина магистраль">
+  <div class="q-num">№ 35</div>
+  <h3 class="q-title">ДК модульдері ... арқылы байланысқан</h3>
+  <p><strong>Жүйелік шина (магистраль)</strong> арқылы. Үш бөліктен тұрады:</p>
+  <ul>
+    <li><strong>Адрестік шина</strong> — адрестерді жібереді (бір бағытты)</li>
+    <li><strong>Деректер шинасы</strong> — деректерді (екі бағытты)</li>
+    <li><strong>Басқару шинасы</strong> — басқару сигналдарын</li>
+  </ul>
+</article>
+
+<article class="q" id="q36" data-search="фон Нейман принцип">
+  <div class="q-num">№ 36</div>
+  <h3 class="q-title">Компьютерлердің ортақ принциптерін негіздеген ғалым</h3>
+  <p><strong>Джон фон Нейман</strong>, 1945 жыл. Принциптері:</p>
+  <ul>
+    <li>Программа мен деректер бір жадта (сақталатын программа принципі)</li>
+    <li>Жад біртекті, ұяшықтары адрестелген</li>
+    <li>Командалар тізбекті орындалады</li>
+    <li>Екілік санау жүйесі</li>
+  </ul>
+</article>
+
+<article class="q" id="q37" data-search="аналогтық АВМ">
+  <div class="q-num">№ 37</div>
+  <h3 class="q-title">Үздіксіз шамаларды өңдейтін компьютерлер</h3>
+  <p><strong>Аналогтық (АВМ)</strong> деп аталады. Физикалық шамаларды (кернеу, ток) тікелей өңдейді. Қазіргі компьютерлер — <strong>цифрлық (ЭЕМ)</strong>, дискретті шамалармен.</p>
+</article>
+
+<article class="q" id="q38" data-search="алғашқы ЭЕМ ENIAC EDVAC">
+  <div class="q-num">№ 38</div>
+  <h3 class="q-title">ЭЕМ шығу кезіндегі архитектура</h3>
+  <p><strong>Фон Нейман (Принстон) архитектурасы</strong>, 1945. Алғашқы ЭЕМ-дер: ENIAC, EDVAC, MESM. Программа мен деректер бір жадта, командалар тізбекті орындалады.</p>
+</article>
+
+<article class="q" id="q39" data-search="параллель интерфейс LPT IDE">
+  <div class="q-num">№ 39</div>
+  <h3 class="q-title">Биттерді параллель жіберетін интерфейс</h3>
+  <p>Параллель — бірнеше битті бір уақытта жібереді:</p>
+  <ul>
+    <li><strong>LPT (Centronics)</strong> — принтерлер</li>
+    <li><strong>IDE/PATA</strong> — ескі дискілер</li>
+    <li><strong>PCI</strong> (PCIe емес!)</li>
+    <li><strong>SCSI</strong> (параллель)</li>
+  </ul>
+  <p><em>Тізбекті: USB, SATA, PCIe, RS-232</em></p>
+</article>
+
+<article class="q" id="q40" data-search="SATA HDD SSD оптикалық">
+  <div class="q-num">№ 40</div>
+  <h3 class="q-title">SATA интерфейсіне қандай құрылғыны қосуға болады?</h3>
+  <p><strong>HDD, 2.5" SSD, оптикалық дискі</strong> (DVD/Blu-ray). NVMe SSD-лер SATA емес — M.2/PCIe арқылы қосылады.</p>
+</article>
+
+<article class="q" id="q41" data-search="шина адрестік деректер басқару">
+  <div class="q-num">№ 41</div>
+  <h3 class="q-title">Әрбір компьютерде бірнеше шина бар. Артығын тап</h3>
+  <p>Негізгі шиналар: <strong>адрестік, деректер, басқару</strong>. Тестте әдетте "артық" жауап ретінде <em>"таймерлік" немесе "жадтық"</em> деген жоқ ұғымдар келеді.</p>
+</article>
+
+<article class="q" id="q42" data-search="бит байт КБ МБ ГБ ТБ өлшем">
+  <div class="q-num">№ 42</div>
+  <h3 class="q-title">Өлшемдерді өсуі бойынша</h3>
+  <span class="formula">бит → байт (8 бит) → КБ (1024 байт) → МБ → ГБ → ТБ → ПБ → ЭБ</span>
+</article>
+
+<article class="q" id="q43" data-search="SIMM жад модуль">
+  <div class="q-num">№ 43</div>
+  <h3 class="q-title">SIMM типті модульдер</h3>
+  <p><strong>SIMM (Single In-line Memory Module)</strong> — бір жақты модуль. Контактілер бір жағында және өзара қосылған. 30 не 72 контакт. Ескі ДК-де (286–Pentium I). Қазір қолданылмайды.</p>
+</article>
+
+<article class="q" id="q44" data-search="DIMM DDR жад модуль">
+  <div class="q-num">№ 44</div>
+  <h3 class="q-title">DIMM типті модульдер</h3>
+  <p><strong>DIMM (Dual In-line Memory Module)</strong> — екі жақты, контактілер тәуелсіз. 168/184/240/288 контакт. Қазіргі DDR3, DDR4, DDR5. Ноутбукте — SO-DIMM.</p>
+</article>
+
+<article class="q" id="q45" data-search="статикалық триггер SRAM">
+  <div class="q-num">№ 45</div>
+  <h3 class="q-title">Триггерде сақтайтын жад</h3>
+  <p><strong>SRAM (Static RAM)</strong> — статикалық жедел жад. Триггерде (6 транзистор) деректер регенерациясыз сақталады. Жылдам, бірақ қымбат. Қолданылуы: <strong>кэш-жад</strong>.</p>
+</article>
+
+<article class="q" id="q46" data-search="екібағытты шина деректер">
+  <div class="q-num">№ 46</div>
+  <h3 class="q-title">Қандай шина екібағыттық?</h3>
+  <p><strong>Деректер шинасы (data bus)</strong> — екі бағытты, өйткені деректер процессордан жадқа да, жадтан процессорға да жіберіледі. Адрестік — бір бағытты.</p>
+</article>
+
+<article class="q" id="q47" data-search="АЛҚ ALU функция">
+  <div class="q-num">№ 47</div>
+  <h3 class="q-title">АЛҚ-ның функциясы</h3>
+  <ul>
+    <li>Арифметикалық: +, –, ×, ÷</li>
+    <li>Логикалық: AND, OR, NOT, XOR</li>
+    <li>Жылжыту/айналдыру (shift, rotate)</li>
+    <li>Салыстыру (флагтар: Z, N, C, V)</li>
+  </ul>
+</article>
+
+<article class="q" id="q48" data-search="процессор бөлік АЛҚ регистр">
+  <div class="q-num">№ 48</div>
+  <h3 class="q-title">Процессордың бөліктері</h3>
+  <p>АЛҚ (ALU), басқару құрылғысы (CU), регистрлер, кэш (L1, L2), команда есептегіші (PC), команда регистрі (IR), декодер, конвейер сатылары.</p>
+</article>
+
+<article class="q" id="q49" data-search="шина өткізу қабілет МБ/с">
+  <div class="q-num">№ 49</div>
+  <h3 class="q-title">Шинаның өткізу қабілеті</h3>
+  <span class="formula">Өткізу қабілеті = тактілік жиілік × шина ені (байт)</span>
+  <p>Мысалы: 64-биттік шина (8 байт), 100 МГц → 800 МБ/с. DDR-да 2 есе көп.</p>
+</article>
+
+<article class="q" id="q50" data-search="қосымша код теріс сан">
+  <div class="q-num">№ 50</div>
+  <h3 class="q-title">Теріс санның қосымша коды</h3>
+  <p><strong>Қосымша код = кері код + 1</strong>, немесе 2ⁿ – |сан|.</p>
+  <p>Алгоритм: 1) модульді екілікке аудару; 2) барлық биттерді инверттеу; 3) +1 қосу.</p>
+  <p><strong>Мысал:</strong> –5 (8 бит)</p>
+  <span class="formula">+5 = 00000101
+инверт = 11111010
++1 = 11111011</span>
+</article>
+
+<article class="q" id="q51" data-search="ЖӘНЕ AND логика">
+  <div class="q-num">№ 51</div>
+  <h3 class="q-title">Логикалық ЖӘНЕ (AND) ақиқат болады, егер...</h3>
+  <p>...<strong>барлық операндтар ақиқат (1) болғанда ғана</strong>.</p>
+  <span class="formula">0 AND 0 = 0
+0 AND 1 = 0
+1 AND 0 = 0
+1 AND 1 = 1</span>
+</article>
+
+<article class="q" id="q52" data-search="стек LIFO PUSH POP">
+  <div class="q-num">№ 52</div>
+  <h3 class="q-title">Стектік жадтың жұмыс істеу принципі</h3>
+  <p><strong>LIFO (Last In — First Out)</strong> — соңғы кірген бірінші шығады. Тарелкелер сияқты.</p>
+  <p>Амалдар: <strong>PUSH</strong> (салу), <strong>POP</strong> (алу). Стек көрсеткіші — <strong>SP (Stack Pointer)</strong>.</p>
+  <p>Қолданылуы: подпрограммаларды шақыру, локалдық айнымалылар, үзулер.</p>
+</article>
+
+<article class="q" id="q53" data-search="сумматор adder full half">
+  <div class="q-num">№ 53</div>
+  <h3 class="q-title">Сумматор дегеніміз</h3>
+  <p>Екілік сандарды қосуға арналған сандық схема. АЛҚ-ның негізгі бөлігі.</p>
+  <ul>
+    <li><strong>Жартылай (half-adder)</strong> — 2 битті қосады, S және C шығарады</li>
+    <li><strong>Толық (full adder)</strong> — 3 битті қосады</li>
+    <li><strong>RCA</strong> (Ripple Carry) — қатарлы қосу</li>
+    <li><strong>CLA</strong> (Carry Lookahead) — жылдам тасымал</li>
+  </ul>
+</article>
+
+<article class="q" id="q54" data-search="10011001 екілік ондық 153">
+  <div class="q-num">№ 54</div>
+  <h3 class="q-title">10011001₂ → ондыққа</h3>
+  <span class="formula">1·128 + 0·64 + 0·32 + 1·16 + 1·8 + 0·4 + 0·2 + 1·1
+= 128 + 16 + 8 + 1 = 153</span>
+  <span class="answer">Жауап: 153₁₀</span>
+</article>
+
+<article class="q" id="q55" data-search="1101 1111 қосу екілік 11100">
+  <div class="q-num">№ 55</div>
+  <h3 class="q-title">1101 + 1111 = ?</h3>
+  <span class="formula">  1101
++ 1111
+──────
+ 11100</span>
+  <p>Тексеру: 13 + 15 = 28 = 11100₂ ✓</p>
+  <span class="answer">Жауап: 11100₂ (28₁₀)</span>
+</article>
+
+<article class="q" id="q56" data-search="1100111 қосымша код 103">
+  <div class="q-num">№ 56</div>
+  <h3 class="q-title">A = –1100111 қосымша коды</h3>
+  <p>8-биттік разрядтылық. Сан = –103₁₀.</p>
+  <span class="formula">1) +103 = 01100111
+2) Инверт = 10011000
+3) +1 = 10011001</span>
+  <span class="answer">Жауап: 10011001₂</span>
+</article>
+
+<article class="q" id="q57" data-search="жоспарлаушы long short medium term">
+  <div class="q-num">№ 57</div>
+  <h3 class="q-title">ОЖ-дегі жоспарлаушылар</h3>
+  <p>Үш түрі бар:</p>
+  <ul>
+    <li><strong>Ұзақ мерзімді</strong> (long-term, job scheduler) — қандай процестерді жүйеге қабылдау</li>
+    <li><strong>Орта мерзімді</strong> (medium-term) — swapping</li>
+    <li><strong>Қысқа мерзімді</strong> (short-term, CPU scheduler) — қай процеске CPU беру (RR, FCFS, SJF, Priority)</li>
+  </ul>
+</article>
+
+<article class="q" id="q58" data-search="есептегіш счётчик counter PC">
+  <div class="q-num">№ 58</div>
+  <h3 class="q-title">Есептегіш — бұл</h3>
+  <p>Кіріс импульстерін санайтын және ағымдағы санды екілік кодта сақтайтын сандық құрылғы. Триггерлерден.</p>
+  <ul>
+    <li>Тура (қосушы), кері (азайтушы), реверсивті</li>
+    <li>Тізбекті (асинхронды), параллель (синхронды)</li>
+  </ul>
+  <p>Процессорда — <strong>PC (Program Counter)</strong> келесі команда адресін сақтайды.</p>
+</article>
+
+<article class="q" id="q59" data-search="тура код оң сан">
+  <div class="q-num">№ 59</div>
+  <h3 class="q-title">Оң санның тура коды ... тең</h3>
+  <p>Санның өзіне тең. Жоғары (таңбалық) разряд = 0, қалғаны — екілік көрінісі.</p>
+  <p><strong>Мысал:</strong> +5 (8 бит) → 00000101. Оң сандар үшін тура, кері және қосымша кодтар <strong>бірдей</strong>.</p>
+</article>
+
+<article class="q" id="q60" data-search="сумматор разряд тасымал carry">
+  <div class="q-num">№ 60</div>
+  <h3 class="q-title">Сумматорда әрбір разрядта неше сан қосылады?</h3>
+  <p><strong>Үш сан</strong>:</p>
+  <ul>
+    <li>А операндының биті</li>
+    <li>В операндының биті</li>
+    <li>Алдыңғы разрядтан келген тасымал (carry-in)</li>
+  </ul>
+  <p>Шығысы: қосынды биті <strong>S</strong> және келесі разрядқа тасымал <strong>carry-out</strong>. Сондықтан "толық сумматор" (full adder) деп аталады.</p>
+</article>
+
+</main>
+
+<footer>
+  <div class="tagline">Сәттілік тілеймін</div>
+  <div>60 сұрақ · қазақ тілінде · мобильге арналған</div>
+</footer>
+
+<button class="scroll-top" id="scrollTop" aria-label="Жоғары">↑</button>
+
+<script>
+  // THEME
+  const themeBtn = document.getElementById('themeBtn');
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    if (next === 'light') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', next);
+  });
+
+  // TOC
+  const tocGrid = document.getElementById('tocGrid');
+  for (let i = 1; i <= 60; i++) {
+    const a = document.createElement('a');
+    a.href = `#q${i}`;
+    a.className = 'toc-item';
+    a.textContent = String(i).padStart(2, '0');
+    tocGrid.appendChild(a);
+  }
+
+  // SEARCH
+  const search = document.getElementById('search');
+  const stats = document.getElementById('searchStats');
+  const questions = document.querySelectorAll('.q');
+  const sections = document.querySelectorAll('.section-divider');
+
+  search.addEventListener('input', () => {
+    const q = search.value.trim().toLowerCase();
+    if (!q) {
+      questions.forEach(el => el.classList.remove('hidden'));
+      sections.forEach(el => el.classList.remove('hidden'));
+      stats.textContent = '';
+      return;
+    }
+    let count = 0;
+    questions.forEach(el => {
+      const text = (el.textContent + ' ' + (el.dataset.search || '')).toLowerCase();
+      if (text.includes(q)) {
+        el.classList.remove('hidden');
+        count++;
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+    sections.forEach(el => el.classList.add('hidden'));
+    stats.textContent = `${count} сұрақ табылды`;
+  });
+
+  // SCROLL TOP
+  const scrollBtn = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) scrollBtn.classList.add('visible');
+    else scrollBtn.classList.remove('visible');
+  });
+  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+</body>
+</html>
